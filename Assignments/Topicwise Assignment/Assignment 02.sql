@@ -1,221 +1,138 @@
--- BASIC FUNCTIONS
+SELECT * FROM employees_operator_practice;
 
-
-
--- STRING FUNCTIONS
-
--- Upper case function
+-- 1: Salary restructuring: Calculate annual salary after a 12% raise for active employees in IT or Finance earning between ₹50,000 and ₹90,000.
 SELECT
-    employee_name,
-    UPPER(employee_name) AS upper_name
-FROM employees_operator_practice;
+	employee_name,
+	salary,
+	department,
+	salary * 12 AS annual_salary,
+	salary * 12 * 1.2 AS annual_salary_after_raise
+FROM employees_operator_practice
+WHERE is_active = TRUE
+	AND department IN ('IT','Finance')
+	AND salary BETWEEN 50000 AND 90000;
 
+-- 2: Employee exclusion: Find employees outside HR and Marketing, aged 25–35 inclusive, with a performance score of at least 4.0.
+SELECT 
+	employee_name,
+	department,
+	age,
+	performance_score
+FROM employees_operator_practice
+	WHERE age BETWEEN 25 AND 35
+	AND performance_score >= 4.0
+	AND department NOT IN ('HR', 'Marketing');
 
--- Lower case function
-SELECT
-    employee_name,
-    LOWER(employee_name) AS lower_name
-FROM employees_operator_practice;
+-- 3: Pattern filtering: Find active employees whose names start with A, S, or R and whose email is not NULL.
+SELECT 
+	employee_name,
+	email,
+	department
+FROM employees_operator_practice
+	WHERE (employee_name LIKE 'A%' 
+	OR employee_name LIKE 'S%'
+	OR employee_name LIKE 'R%')
+	AND email IS NOT NULL ;
 
+-- 4: City comparison: Find cities where IT employees work but HR employees do not, sorted alphabetically.
+SELECT 
+	employee_name,
+	city,
+	department
+FROM employees_operator_practice
+	WHERE department = 'IT'
+EXCEPT
+SELECT 
+	employee_name,
+	city,
+	department
+FROM employees_operator_practice
+	WHERE department = 'HR'
 
--- Length function
-SELECT
-    employee_name,
-    LENGTH(employee_name) AS length_name
-FROM employees_operator_practice;
+	ORDER BY city;
 
+-- 5: Combined department results: Return distinct employee names from active IT employees earning over ₹70,000 and active HR employees earning over ₹60,000, using UNION.
+SELECT 
+	employee_name,
+	department,
+	salary
+FROM employees_operator_practice
+	WHERE department = 'IT'
+	AND salary >=70000
 
--- Concat function
+UNION
+
+SELECT 
+	employee_name,
+	department,
+	salary
+FROM employees_operator_practice
+	WHERE department = 'HR'
+	AND salary >=60000;
+
+-- 6: Salary remainder: Find employees whose salary is divisible by ₹5,000, age is under 40, and experience is at least 3 years
+
+SELECT 
+	employee_name,
+	salary,
+	age,
+	years_experience
+FROM employees_operator_practice
+	WHERE salary % 5000 = 0
+	AND age < 40
+	AND years_experience >=3;
+
+-- 7: Complex logical filtering: Find employees who are either in IT and earn over ₹75,000, or in HR and have a performance score of at least 4.5, while excluding inactive employees.
+SELECT 
+	employee_name,
+	performance_score,
+	salary,
+	department
+FROM employees_operator_practice
+	WHERE (department = 'IT' AND salary >= 75000)
+	OR (department = 'HR' AND performance_score >= 4.5)
+	AND is_active = True;
+
+-- 8: Set-operation challenge: Find cities shared by IT, HR, and Finance employees using set operators.
+SELECT city
+FROM employees_operator_practice
+WHERE department = 'IT'
+
+INTERSECT
+
+SELECT city
+FROM employees_operator_practice
+WHERE department = 'HR'
+
+INTERSECT
+
+SELECT city
+FROM employees_operator_practice
+WHERE department = 'Finance';
+
+-- 9: Multiple conditions: Find active employees in Pune or Nagpur earning between ₹40,000 and ₹80,000, excluding employees with a performance score below 3.0.
 SELECT
     employee_name,
     city,
-    CONCAT(employee_name, '-', city) AS employee_details
-FROM employees_operator_practice;
-
-
--- Substring function
-SELECT
-    employee_name,
-    SUBSTRING(employee_name FROM 1 FOR 3) AS first_three_letters
-FROM employees_operator_practice;
-
-
--- Substring function (Email prefix)
-SELECT
-    email,
-    SUBSTRING(email FROM 1 FOR 5) AS email_prefix
-FROM employees_operator_practice
-WHERE email IS NOT NULL;
-
-
--- Trim function
-SELECT
-    employee_name,
-    TRIM(employee_name) AS trimmed_name
-FROM employees_operator_practice;
-
-
--- Replace function
-SELECT
-    employee_name,
-    REPLACE(employee_name, 'a', '@') AS modified_name
-FROM employees_operator_practice;
-
-
--- Combination of Upper case and Length functions
--- ROUND function
-SELECT
-    employee_name,
     salary,
-    ROUND(salary / 12.0, 2) AS rounded_monthly_value
-FROM employees_operator_practice;
-
-
--- ABS function
-SELECT
-    employee_name,
-    salary,
-    ABS(salary - 50000) AS difference_from_50000
-FROM employees_operator_practice;
-
-
--- CEIL function
-SELECT
-    employee_name,
-    salary,
-    CEIL(salary / 1000.0) AS salary_rounded_up
-FROM employees_operator_practice;
-
-
--- FLOOR function
-SELECT
-    employee_name,
-    salary,
-    FLOOR(salary / 1000.0) AS salary_rounded_down
-FROM employees_operator_practice;
-
-
--- MOD function
-SELECT
-    employee_name,
-    salary,
-    MOD(salary, 5000) AS salary_remainder
-FROM employees_operator_practice;
-
-
--- DATE AND TIME FUNCTIONS
-
-
--- CURRENT_DATE function
-SELECT
-    employee_name,
-    hire_date,
-    CURRENT_DATE AS today_date
-FROM employees_operator_practice;
-
-
--- AGE function
-SELECT
-    employee_name,
-    hire_date,
-    AGE(CURRENT_DATE, hire_date) AS employment_duration
-FROM employees_operator_practice;
-
-
--- EXTRACT function
-SELECT
-    employee_name,
-    hire_date,
-    EXTRACT(MONTH FROM hire_date) AS hire_month
-FROM employees_operator_practice;
-
-
--- Date arithmetic (6 months after hire date)
-SELECT
-    employee_name,
-    hire_date,
-    hire_date + INTERVAL '6 months' AS date_after_six_months
-FROM employees_operator_practice;
-
-
-
--- AGGREGATE FUNCTIONS 
--- COUNT function
-SELECT
-    COUNT(*) AS total_employees
-FROM employees_operator_practice;
-
-
--- SUM function
-SELECT
-    SUM(salary) AS total_salary
-FROM employees_operator_practice;
-
-
--- AVG function
-SELECT
-    AVG(salary) AS average_salary
-FROM employees_operator_practice;
-
-
--- MIN function
-SELECT
-    MIN(salary) AS minimum_salary
-FROM employees_operator_practice;
-
-
--- MAX function
-SELECT
-    MAX(salary) AS maximum_salary
-FROM employees_operator_practice;
-
-
--- Having and Group by 
--- Q1. GROUP BY + COUNT()
--- Count employees in each department
-SELECT
-    department,
-    COUNT(*) AS employee_count
-FROM employees_operator_practice
-GROUP BY department;
-
-
--- Q2. GROUP BY + AVG()
--- Calculate average salary for each department
-SELECT
-    department,
-    AVG(salary) AS average_salary
-FROM employees_operator_practice
-GROUP BY department;
-
-
--- Q3. GROUP BY + SUM() + HAVING
--- Departments with total salary greater than 200000
-SELECT
-    department,
-    SUM(salary) AS total_salary
-FROM employees_operator_practice
-GROUP BY department
-HAVING SUM(salary) > 200000;
-
-
--- Q4. GROUP BY + COUNT() + HAVING
--- Departments with more than 5 employees
-SELECT
-    department,
-    COUNT(*) AS employee_count
-FROM employees_operator_practice
-GROUP BY department
-HAVING COUNT(*) > 5;
-
-
--- Q5. WHERE + GROUP BY + HAVING
--- Active employees in departments with average salary above 50000
-SELECT
-    department,
-    AVG(salary) AS average_salary
+    performance_score
 FROM employees_operator_practice
 WHERE is_active = TRUE
-GROUP BY department
-HAVING AVG(salary) > 50000;
+  AND city IN ('Pune', 'Nagpur')
+  AND salary BETWEEN 40000 AND 80000
+  AND performance_score >= 3.0;
 
+-- 10: Business report: Display employee name, department, monthly salary, annual salary, and annual salary after a 10% bonus for active employees whose salary exceeds ₹80,000 or whose performance score is at least 4.8. Sort by the final calculated amount in descending order
+SELECT
+    employee_name,
+    department,
+    salary,
+    salary * 12 AS annual_salary,
+    salary * 12 * 1.10 AS annual_salary_with_bonus
+FROM employees_operator_practice
+WHERE is_active = TRUE
+  AND (
+      salary > 80000
+      OR performance_score >= 4.8
+  )
+ORDER BY annual_salary_with_bonus DESC;
